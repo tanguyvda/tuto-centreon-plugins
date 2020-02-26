@@ -4,6 +4,7 @@
 1. [INTRODUCTION](#introduction)
 2. [STARTING OUR PROJECT](#starting-our-project)
 3. [INITIATE OUR PLUGIN](#initiate-our-plugin)
+4. [CREATE OUR FIRST MODE](#create-our-first-mode)
 
 ## INTRODUCTION <a name="introduction"></a>
 This documentation is here to help you go through the development of a Centreon plugin.
@@ -32,7 +33,7 @@ to check the number of users connected to it.
 
 - open the plugin.pm file and write the following code
 
-```
+```perl
 # path + name of the perl module
 package os::tutoOS::snmp::plugin;
 
@@ -45,7 +46,7 @@ use Data::Dumper;
 
 - Now that we have loaded every usefull libraries we need to create a subroutine called "new"
 
-```
+```perl
 # path + name of the perl module
 package os::tutoOS::snmp::plugin;
 
@@ -53,10 +54,12 @@ package os::tutoOS::snmp::plugin;
 use strict;
 use warnings;
 use base qw(centreon::plugins::script_snmp);
+
+# this one is for debugging purpose, when your plugin is ready, you should remove it
 use Data::Dumper;
 
 sub new {
-    # those are our subrouting private arguments.
+    # those are our subroutine private arguments.
     my ($class, %options) = @_;
 
     # create $self object
@@ -65,7 +68,7 @@ sub new {
     # tell perl to search method called on the $self object within our package/class os::tutoOS::snmp::plugin
     bless $self, $class;
 
-    # initiate version our plugin
+    # initiate our plugin version
     $self->{version} = '0.1';
 
     # initiate modes of our plugin
@@ -92,7 +95,7 @@ use base qw(centreon::plugins::script_snmp);
 use Data::Dumper;
 
 sub new {
-    # those are our subrouting private arguments.
+    # those are our subroutine private arguments.
     my ($class, %options) = @_;
 
     # create $self object
@@ -131,6 +134,54 @@ At this point, you should already be able to use your plugin, you can check that
 `perl centreon_plugins.pl --plugin=os::tutoOS::snmp::plugin --help`
 
 ![list mode](images/1-list_mode_plugin-1_1.png)
+
+## CREATE OUR FIRST MODE <a name="create-our-first-mode"></a>
+We are going to start with an easy mode. We are just going to retrieve how many logged users we have on our
+tutoOS server. Let people put alerting thresholds so we have a monitoring vibe to our plugin.
+
+Here is the very beginning of our users.pm file
+```perl
+# path + name of the perl module
+package os::tutoOS::snmp::mode::users;
+
+# load needed libraries
+use base qw(centreon::plugins::templates::counter);
+use strict;
+use warnings;
+```
+
+Now we are going to instanciate our mode
+
+```perl
+# path + name of the perl module
+package os::tutoOS::snmp::mode::users;
+
+# load needed libraries
+use base qw(centreon::plugins::templates::counter);
+use strict;
+use warnings;
+
+sub new {
+    # those are our subroutine private arguments.
+    my ($class, %options) = @_;
+
+    # create $self object
+    my $self = $class::SUPER::new(package => __PACKAGE__, %options);
+
+    # tell perl to search method called on the $self object within our package/class os::tutoOS::snmp::plugin
+    bless $self, $class;
+
+    $options{options}->add_options(
+        arguments => {
+            'warning:s' => {
+                name => 'warning'
+            },
+            'critical:s' => {
+                name => 'critical'
+            }
+        }
+    );
+}
 
 HOST-RESOURCES-MIB::hrSystemNumUsers.0
 sysdescr

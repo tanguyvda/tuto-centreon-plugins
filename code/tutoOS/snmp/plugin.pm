@@ -8,7 +8,7 @@ use base qw(centreon::plugins::script_snmp);
 use Data::Dumper;
 
 sub new {
-    # those are our subrouting private arguments.
+    # those are our subroutine private arguments.
     my ($class, %options) = @_;
 
     # create $self object
